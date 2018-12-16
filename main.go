@@ -9,8 +9,14 @@ import (
 	"strings"
 )
 
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	gin.SetMode(os.Getenv("GIN_MODE"))
+}
+
 func main() {
-	setup()
 	r := gin.New()
 	if gin.IsDebugging() {
 		r.Use(gin.Logger())
@@ -35,10 +41,4 @@ func main() {
 
 func get(c *gin.Context, key string) string {
 	return strings.TrimSpace(c.DefaultQuery(key, c.DefaultPostForm(key, c.GetHeader(key))))
-}
-func setup() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	gin.SetMode(os.Getenv("GIN_MODE"))
 }
