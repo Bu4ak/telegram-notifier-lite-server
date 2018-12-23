@@ -78,7 +78,6 @@ func listenUpdates() {
 		if update.Message == nil {
 			continue
 		}
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 		token, exists := tokens[update.Message.Chat.ID]
 		if !exists {
 			token = randToken(30)
