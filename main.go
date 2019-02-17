@@ -96,20 +96,20 @@ func listenUpdates() {
 	}
 }
 
-func getChatIdByToken(token string) (chatId int64) {
+func getChatIdByToken(token string) (chatID int64) {
 	q := "select chat_id from users where token = $1"
-	if e := db.QueryRow(q, token).Scan(&chatId); e != nil && e.Error() != "sql: no rows in result set" {
+	if e := db.QueryRow(q, token).Scan(&chatID); e != nil && e.Error() != "sql: no rows in result set" {
 		log.Panic(e.Error())
 	}
 	return
 }
 
-func getTokenById(chatId int64) (token string) {
-	if e := db.QueryRow("select token from users where chat_id = $1", chatId).Scan(&token); e != nil {
+func getTokenById(chatID int64) (token string) {
+	if e := db.QueryRow("select token from users where chat_id = $1", chatID).Scan(&token); e != nil {
 		if e.Error() == "sql: no rows in result set" {
 			token = randToken(32)
 			q := "insert into users (chat_id, token, created_at) values ($1, $2, now())"
-			if _, err := db.Exec(q, chatId, token); err != nil {
+			if _, err := db.Exec(q, chatID, token); err != nil {
 				log.Panic(e.Error())
 			}
 		} else {
