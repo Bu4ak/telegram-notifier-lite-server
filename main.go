@@ -96,17 +96,15 @@ func listenUpdates() {
 	}
 }
 
-func getChatIdByToken(token string) int64 {
-	var chatId int64
+func getChatIdByToken(token string) (chatId int64) {
 	q := "select chat_id from users where token = $1"
 	if e := db.QueryRow(q, token).Scan(&chatId); e != nil && e.Error() != "sql: no rows in result set" {
 		log.Panic(e.Error())
 	}
-	return chatId
+	return
 }
 
-func getTokenById(chatId int64) string {
-	var token string
+func getTokenById(chatId int64) (token string) {
 	if e := db.QueryRow("select token from users where chat_id = $1", chatId).Scan(&token); e != nil {
 		if e.Error() == "sql: no rows in result set" {
 			token = randToken(32)
@@ -118,7 +116,7 @@ func getTokenById(chatId int64) string {
 			log.Panic(e.Error())
 		}
 	}
-	return token
+	return
 }
 
 func randToken(n int) string {
