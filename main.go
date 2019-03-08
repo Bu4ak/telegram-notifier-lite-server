@@ -2,20 +2,20 @@ package main
 
 import (
 	"database/sql"
-	"github.com/gin-gonic/gin"
-	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
+	"telegram-notifier-server/util"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 var bot *tgbotapi.BotAPI
 var db *sql.DB
 var router *gin.Engine
@@ -55,8 +55,8 @@ func main() {
 			Token   string `json:"token"`
 			Message string `json:"message"`
 		}
-		req.Token = get(c, "token")
-		req.Message = get(c, "message")
+		req.Token = util.Get(c, "token")
+		req.Message = util.Get(c, "message")
 
 		if c.ContentType() == gin.MIMEJSON {
 			c.BindJSON(&req)
@@ -73,10 +73,6 @@ func main() {
 	})
 	go listenUpdates()
 	router.Run()
-}
-
-func get(c *gin.Context, key string) string {
-	return strings.TrimSpace(c.DefaultQuery(key, c.DefaultPostForm(key, c.GetHeader(key))))
 }
 
 func listenUpdates() {
@@ -107,7 +103,7 @@ func getChatIdByToken(token string) (chatID int64) {
 func getTokenById(chatID int64) (token string) {
 	if e := db.QueryRow("select token from users where chat_id = $1", chatID).Scan(&token); e != nil {
 		if e.Error() == "sql: no rows in result set" {
-			token = randToken(32)
+			token = util.RandToken(32)
 			q := "insert into users (chat_id, token, created_at) values ($1, $2, now())"
 			if _, err := db.Exec(q, chatID, token); err != nil {
 				log.Panic(e.Error())
@@ -117,12 +113,4 @@ func getTokenById(chatID int64) (token string) {
 		}
 	}
 	return
-}
-
-func randToken(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-	return string(b)
 }

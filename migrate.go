@@ -2,11 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"log"
+	"os"
+
 	"github.com/DavidHuie/gomigrate"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"log"
-	"os"
 )
 
 func main() {
