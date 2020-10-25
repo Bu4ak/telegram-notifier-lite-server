@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"telegram-notifier-server/util"
 	"time"
 
+	"./util"
+
 	"github.com/gin-gonic/gin"
-	"github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -47,6 +48,7 @@ func init() {
 		log.Fatal(err)
 	}
 	bot.Debug, _ = strconv.ParseBool(os.Getenv("TELEGRAM_BOT_DEBUG"))
+	bot.RemoveWebhook()
 }
 
 func main() {

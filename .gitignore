@@ -2,3 +2,4 @@
 .env
 pgdata/
 error.log
+.vscode
