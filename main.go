@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"./util"
-
+	"github.com/DavidHuie/gomigrate"
+	"github.com/bu4ak/telegram-notifier-lite-server/util"
 	"github.com/gin-gonic/gin"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/joho/godotenv"
@@ -25,9 +25,7 @@ func init() {
 	var err error
 	rand.Seed(time.Now().UnixNano())
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
 	gin.SetMode(os.Getenv("GIN_MODE"))
 	if gin.Mode() == "release" {
 		logFile, _ := os.Create("error.log")
@@ -40,6 +38,12 @@ func init() {
 	}
 
 	db, err = sql.Open("postgres", os.Getenv("POSTGRES_URL"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	migrator, _ := gomigrate.NewMigrator(db, gomigrate.Postgres{}, "./migrations")
+	err = migrator.Migrate()
 	if err != nil {
 		log.Fatal(err)
 	}
